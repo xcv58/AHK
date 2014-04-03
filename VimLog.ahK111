@@ -1,0 +1,155 @@
+;---------------------浏览器自动复制到t.txt---------------------------
+#If WinActive("ahk_class Chrome_WidgetWin_0") or WinActive("ahk_class IEFrame") or WinActive("ahk_class MozillaWindowClass") or WinActive("ahk_class AcrobatSDIWindow")
+!C::
+{
+  Send ^{Insert}
+  ;WinGetTitle, CurrentTitle, A
+sleep 100
+  IfWinExist, t.txt
+  {
+     ControlSend,, +{Insert},t.txt
+     ;ControlSend,, {Enter},t.txt
+  }
+  SetTitleMatchMode, 2
+  targetTilte2 = 军事.txt
+  IfWinExist, 军事.txt
+  {
+     ControlSend,, +{Insert},%targetTitle2%
+     ControlSend,, {Enter},%targetTitle2%
+  }
+;  else
+;    Run gvim "D:/t.txt"
+return
+}
+#If
+
+;-----------------在VIM里的快捷键-------------------
+#If WinActive("ahk_class Vim")
+^z::
+SendInput ^s
+WinGetClass, class, A
+;MsgBox, The active window's class is "%class%".
+WinMinimize ahk_class %class%
+return
+
+^f::
+Send {esc}
+Send {A}
+result := RegExReplace(Clipboard, "(?<=[^\s])\s(?=[^\s])", "，")
+;msgbox %result%
+StringLen,length,result
+StringMid,lastChar,result,length,1
+if lastChar = 。
+{
+}
+else
+{
+   result = %result%。
+}
+Clipboard := result
+enIME()
+Loop 4
+{
+Send {Space}
+}
+Send +{Insert}
+result = 
+zhIME()
+return
+
+
+;--------------log文件的时间计算------------
+^j::
+{
+	FormatTime,CurrentDate,,yyyy.MM.dd
+	FormatTime,CurrentTime,,HH:mm   ;当前时间格式
+	IfWinActive, %CurrentDate%.txt
+	{
+		;MsgBox %Title%
+		origin := Clipboard
+		;;Msgbox %origin%
+		Send {Esc}
+		Send {^}{l 5}
+		Send {a}%CurrentTime%      ;定位输入位置并输入当前时间
+		Send {space}{space}
+		Send {Esc}{^}
+		Send {v}{$}
+		Send ^{c}
+                ;ToolTip, %Clipboard%
+		target := Clipboard
+		;MsgBox %target%
+		StringMid, h1, target, 0, 2
+		StringMid, m1, target, 4, 2
+		StringMid, h2, target, 7, 2
+		StringMid, m2, target, 10, 2
+		;MsgBox %h1% %m1%  %h2% %m2%
+		cap := (h2 - h1)*60 +m2 -m1    ;运算并判断
+		;MsgBox %cap%
+		if(cap >= 60)
+		{
+			hours := cap//60
+			cap -= hours*60
+			result = %hours%小时
+		}
+		if(cap != 0)
+		{
+			result = %result%%cap%分钟
+		}
+		StringLen,result_L,result
+		if(result_L==0)
+		{
+			result = 你也太恶搞了！
+		}
+                Sleep 200
+		Send {A}
+		StringLen,Len,target
+		;;     msgbox %target%||%Len%
+		if(Len<19)
+		{
+			Send {Tab}
+		}
+		if(Len<23)
+		{
+			Send {Tab}
+		}
+		if(Len<27)
+		{
+			Send {Tab}
+		}
+		Send {Tab}
+		Clipboard := result
+		;SendInput %result%`n
+                Send ^v
+                Sleep 200
+		SendInput `n%CurrentTime%-
+		Send {Esc}^{s}     ;输出结果并输入当前时间并保存
+                enIME()
+                Send :wq
+		;清空结果
+		target = 
+		result_L = 
+		result =
+		hours =
+		h1 =
+		h2 =
+		m1 =
+		m2 =
+		cap =
+		CurrentTime =
+		Len =
+
+		Clipboard := origin        ;拷贝回剪贴板
+		origin =
+		Sleep 800
+;		WinActivate, %CurrentDate%.txt
+;		Send {:}
+;		enIME()
+;		Send {w}{q}
+                ControlSend,, {Enter},%CurrentDate%.txt
+;		Send {Enter}
+	}
+return
+}
+#If
+
+
